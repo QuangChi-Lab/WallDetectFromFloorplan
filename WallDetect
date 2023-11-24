@@ -1,0 +1,60 @@
+using Emgu.CV;
+using Emgu.CV.CvEnum;
+using Emgu.CV.Structure;
+using System;
+using System.Drawing;
+
+namespace LineDetectionApp
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            // Replace "path_to_your_input_image.png" with your image file path
+            string imagePath = "G:\\OpenCV test\\example2.png";
+
+            // Read the input image
+            Mat inputImage = CvInvoke.Imread(imagePath, ImreadModes.Color);
+
+            // Apply Canny edge detection to the input image
+            Mat edges = DetectEdges(inputImage);
+
+            // Detect straight lines using Probabilistic Hough Line Transform
+            LineSegment2D[] lines = CvInvoke.HoughLinesP(edges, 1, Math.PI / 180, 100, 10, 10);
+
+            // Draw detected lines on a blank image
+            Mat resultImage = new Mat(inputImage.Size, DepthType.Cv8U, 3);
+            resultImage.SetTo(new MCvScalar(255, 255, 255)); // Set background to white
+
+            foreach (LineSegment2D line in lines)
+            {
+                CvInvoke.Line(resultImage, line.P1, line.P2, new MCvScalar(0, 0, 0), 2); // Draw lines in black
+            }
+
+            // Display the output image with detected lines
+            CvInvoke.Imshow("Detected Lines", resultImage);
+            CvInvoke.WaitKey(0); // Wait for a key press to close the window
+
+            // Save the output image with detected lines
+            string outputImagePath = "output_lines.png";
+            CvInvoke.Imwrite(outputImagePath, resultImage);
+        }
+
+        // Function to perform Canny edge detection on the input image
+        static public Mat DetectEdges(Mat inputImage)
+        {
+            // Convert the input image to grayscale for edge detection
+            Mat grayImage = new Mat();
+            CvInvoke.CvtColor(inputImage, grayImage, ColorConversion.Bgr2Gray);
+
+            // Reduce noise using Gaussian Blur
+            CvInvoke.GaussianBlur(grayImage, grayImage, new Size(5, 5), 0);
+
+            // Apply Canny edge detection
+            Mat edges = new Mat();
+            CvInvoke.Canny(grayImage, edges, 60, 100);
+
+            return edges;
+        }
+    }
+}
