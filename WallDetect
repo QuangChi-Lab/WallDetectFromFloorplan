@@ -10,7 +10,7 @@ namespace LineDetectionApp
     {
         static void Main(string[] args)
         {
-            // Replace "path_to_your_input_image.png" with your image file path
+            // File path
             string imagePath = "G:\\OpenCV test\\example2.png";
 
             // Read the input image
